@@ -9,6 +9,7 @@
   "author": "Ferruccio Irionè",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "jsforce": "^1.7.0"
   }
