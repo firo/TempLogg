@@ -4,7 +4,7 @@ var json = { status: '' };
 app.locals.data = [];
 
 // rules for defining the response and light color
-app.use('/log/:id/:temp', function (req, res, next) {
+app.use('/:id/:temp', function (req, res, next) {
   if (req.params.temp < 20 ) {
     json.status = 'GREEN';
   } else if (req.params.temp < 23) {
@@ -16,7 +16,7 @@ app.use('/log/:id/:temp', function (req, res, next) {
 });
 
 // cache the income data
-app.use('/log/:id/:temp', function (req, res, next) {
+app.use('/:id/:temp', function (req, res, next) {
   // do some action if income temperature is diffrence from previous one
   if (req.params.temp != app.locals.data[req.params.id]) {
       app.locals.data[req.params.id] = req.params.temp;
@@ -26,14 +26,14 @@ app.use('/log/:id/:temp', function (req, res, next) {
 });
 
 // logger for temperature by device id
-app.use('/log/:id/:temp', function (req, res, next) {
+app.use('/:id/:temp', function (req, res, next) {
   console.log('-> device id: ' + req.params.id + ' temperature: ' + req.params.temp);
   next();
 });
 
 // The handler function (middleware system).
 // The function handles GET requests to the /user/:id path.
-app.get('/log/:id/:temp', function (req, res) {
+app.get('/:id/:temp', function (req, res) {
   res.type('json');               // => 'application/json'
   res.json(json);
 });
