@@ -19,8 +19,11 @@ app.use('/:id/:temp', function (req, res, next) {
 app.use('/:id/:temp', function (req, res, next) {
   // do some action if income temperature is diffrence from previous one
   if (req.params.temp != app.locals.data[req.params.id]) {
-      app.locals.data[req.params.id] = req.params.temp;
-      console.log('updated locals data');
+    app.locals.data[req.params.id] = req.params.temp;
+    console.log('updated locals data');
+    json.data = 'updated';
+  } else {
+    json.data = 'cached';
   }
   next();
 });
@@ -38,7 +41,7 @@ app.get('/:id/:temp', function (req, res) {
   res.json(json);
 });
 
-var server = app.listen(process.env.PORT, function () {
+var server = app.listen(process.env.PORT || 3000, function () {
   var host = server.address().address;
   var port = server.address().port;
   console.log('Web server started at http://%s:%s', host, port);
