@@ -44,8 +44,17 @@ app.get('/:id/:temp', function (req, res) {
 app.post('/closedcase',function(req,res){
   req.setEncoding('utf8');
   var request = req.body;
+  console.log('post');
   console.log(request);
-  res.end("yes");
+  res.end("ok");
+});
+
+app.get('/closedcase', function(req,res){
+  req.setEncoding('utf8');
+  var request = req.body;
+  console.log('get');
+  console.log(request);
+  res.end("ok");
 });
 
 var server = app.listen(process.env.PORT || 3000, function () {
