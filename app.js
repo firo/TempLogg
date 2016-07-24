@@ -47,8 +47,8 @@ app.get('/:id/:temp', function (req, res) {
 
 app.post('/closedcase',function(req,res) {
   //req.setEncoding('utf8');
-  console.log('soap in call in post');
-  console.log('req'+req.body);
+  console.log('soap post in call');
+  console.log("request: %j", req.body);
   res.end("ok");
 });
 
