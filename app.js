@@ -1,29 +1,7 @@
 var express = require('express');
 var app = express();
 var json = { status: '' };
-app.locals.data = [];
 
-// rules for defining the response and light color
-app.use('/:id/:temp', function (req, res, next) {
-  if (req.params.temp < 20 ) {
-    json.status = 'GREEN';
-  } else if (req.params.temp < 23) {
-    json.status = 'YELLOW';
-  } else if (req.params.temp >= 23) {
-    json.status = 'RED';
-  }
-  next();
-});
-
-// cache the income data
-app.use('/:id/:temp', function (req, res, next) {
-  // do some action if income temperature is diffrence from previous one
-  if (req.params.temp != app.locals.data[req.params.id]) {
-      app.locals.data[req.params.id] = req.params.temp;
-      console.log('updated locals data');
-  }
-  next();
-});
 
 // logger for temperature by device id
 app.use('/:id/:temp', function (req, res, next) {
