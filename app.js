@@ -42,18 +42,9 @@ app.get('/:id/:temp', function (req, res) {
 });
 
 app.post('/closedcase',function(req,res){
-  req.setEncoding('utf8');
-  var request = req.body;
-  console.log('post');
-  console.log(request);
-  res.end("ok");
-});
-
-app.get('/closedcase', function(req,res){
-  req.setEncoding('utf8');
-  var request = req.body;
-  console.log('get');
-  console.log(request);
+  //req.setEncoding('utf8');
+  console.log('soap in call in post');
+  console.log(req.body);
   res.end("ok");
 });
 
