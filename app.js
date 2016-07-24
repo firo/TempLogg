@@ -1,4 +1,5 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 var json = { status: '' };
 app.locals.data = [];
@@ -34,6 +35,9 @@ app.use('/:id/:temp', function (req, res, next) {
   next();
 });
 
+
+app.use(bodyParser.raw());
+
 // The handler function (middleware system).
 // The function handles GET requests to the /user/:id path.
 app.get('/:id/:temp', function (req, res) {
@@ -41,7 +45,7 @@ app.get('/:id/:temp', function (req, res) {
   res.json(json);
 });
 
-app.post('/closedcase',function(req,res){
+app.post('/closedcase',function(req,res) {
   //req.setEncoding('utf8');
   console.log('soap in call in post');
   console.log('req'+req.body);
