@@ -35,7 +35,8 @@
                         socket.on('temperatureUpdate', function (t, d) {
                           console.log(d);
                               var x = (new Date()).getTime(),
-                                  y = parseInt(d);
+                                  y = parseFloat(d);
+                                  console.log(y);
                               series.addPoint([x, y], true, true);
                         });
 
