@@ -11,10 +11,9 @@ var json = { status: '' };
 app.use('/js',express.static( __dirname + '/client/js'));
 app.use('/style',express.static( __dirname + '/client/css'));
 
-
 // --> Express Middleware
 // rules for defining the response and light color
-app.use('/:id/:temp', function (req, res, next) {
+app.use('/:temp', function (req, res, next) {
   if (req.params.temp < 20 ) {
     json.status = 'GREEN';
   } else if (req.params.temp < 23) {
@@ -25,35 +24,38 @@ app.use('/:id/:temp', function (req, res, next) {
   next();
 });
 
-// rules for chaching data
-app.use('/:id/:temp', function (req, res, next) {
-  // do some action if income temperature is diffrence from previous one
-  if (req.params.temp != app.locals.data[req.params.id]) {
-    app.locals.data[req.params.id] = req.params.temp;
-    console.log('updated locals data');
-    json.data = 'updated';
-  } else {
-    json.data = 'cached';
-  }
+// logger for temperature by device id and emit temperature to all sockets connected
+app.use('/:temp', function (req, res, next) {
+  console.log('-> temperature: ' + req.params.temp);
+  var date = new Date().getTime();
+  io.sockets.emit('temperatureUpdate', date, req.params.temp); // dashboard web
   next();
 });
 
-// logger for temperature by device id
-app.use('/:id/:temp', function (req, res, next) {
-  console.log('-> device id: ' + req.params.id + ' temperature: ' + req.params.temp);
-  // emit temperature to all sockets connected
-  var date = new Date().getTime();
-  io.sockets.emit('temperatureUpdate', date, req.params.temp);
+// compute the data analytics
+app.use('/:temp', function (req, res, next) {
+  app.locals.data.push(req.params.temp);
+  if (app.locals.data.length > 5){
+    console.log('enought data');
+    var max = Math.max.apply(null, app.locals.data);
+    var min = Math.min.apply(null, app.locals.data);
+    console.log('max: ' + max + ' min: '+ min);
+    if ( (max - min) > 2 ) console.log('OPEN CASE');
+  } else {
+    console.log('need more data');
+  }
+
   next();
 });
+
+
 
 // The handler function (middleware system).
 // The function handles GET requests to the /:id/:temp path.
-app.get('/:id/:temp', function (req, res) {
+app.get('/:temp', function (req, res) {
   res.type('json');               // => 'application/json'
   res.json(json);                 // => send json back to client
 });
-
 
 // Manage the income outbout messages
 app.post('/closedcase',function(req,res) {
@@ -74,3 +76,17 @@ var port = process.env.PORT || 3000; // Use the port that Heroku provides or def
 http.listen(port, function(){
   console.log("Express server listening on port %d in %s mode", port, app.settings.env);
 });
+
+// rules for chaching data
+/*app.use('/:id/:temp', function (req, res, next) {
+  // do some action if income temperature is diffrence from previous one
+  if (req.params.temp != app.locals.data[req.params.id]) {
+    app.locals.data[req.params.id] = req.params.temp;
+    //console.log('updated locals data');
+    json.data = 'updated';
+  } else {
+    json.data = 'cached';
+  }
+  next();
+});
+*/
