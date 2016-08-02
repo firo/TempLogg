@@ -2,11 +2,18 @@ var express   =     require("express");
 var app       =     express();
 var http 	    = 	require('http').Server(app);
 var io 		    = 	require('socket.io')(http);
+var jsforce = require('jsforce');
+
 
 app.locals.data = [];
+app.locals.case_id = [];
+app.locals.refdelta = 3;
 
+var conn = new jsforce.Connection();
 var env = process.env.NODE_ENV || 'development';
 var json = { status: '' };
+var username = 'admin@firo.trial';
+var password = 'salesforce1' + 'Iy1rWE4nTYF0TMzihuAtVakun'
 
 app.use('/js',express.static( __dirname + '/client/js'));
 app.use('/style',express.static( __dirname + '/client/css'));
@@ -35,14 +42,42 @@ app.use('/:temp', function (req, res, next) {
 // compute the data analytics
 app.use('/:temp', function (req, res, next) {
   app.locals.data.push(req.params.temp);
-  if (app.locals.data.length > 5){
-    console.log('enought data');
+  if (app.locals.data.length > 10){
+    // console.log('enought data');
     var max = Math.max.apply(null, app.locals.data);
     var min = Math.min.apply(null, app.locals.data);
-    console.log('max: ' + max + ' min: '+ min);
-    if ( (max - min) > 2 ) console.log('OPEN CASE');
+    delta = max - min;
+    // console.log('max: ' + max + ' min: '+ min);
+    if ( delta > app.locals.refdelta ) {
+      //console.log('OPEN CASE');
+      conn.login(username, password, function(err, userInfo) {
+        if (err) { return console.error(err); }
+        var records = [];
+        // Single record creation
+        conn.sobject("Case").create({ Subject : 'Temperature too high',
+                                      Description : 'the device Frigo17B has reached a too high temperature with a greater increase in the average of all similar devices. '+
+                                      'Current temperature is ' + req.params.temp + 'C with the increase of ' + delta + ' C.',
+                                      ContactId : '0035800000FqZqgAAF',
+                                      Origin : 'IoT',
+                                      Priority : 'Medium',
+                                      Status :  'New',
+                                      SuppliedName : 'Frigo17B' }, function(err, ret) {
+          if (err || !ret.success) { return console.error(err, ret); }
+          //console.log("Created record id : " + ret.id);
+        });
+
+        conn.logout(function(err) {
+          if (err) { return console.error(err); }
+          // now the session has been expired.
+        });
+
+      });
+    } /*
+    else if (delta > 5 ) {
+      console.log('update CASE priority red');
+    }*/
   } else {
-    console.log('need more data');
+    // console.log('need more data');
   }
 
   next();
@@ -56,6 +91,14 @@ app.get('/:temp', function (req, res) {
   res.type('json');               // => 'application/json'
   res.json(json);                 // => send json back to client
 });
+
+// change delta degree
+app.get('/delta/:var', function (req, res) {
+  app.locals.refdelta = req.params.var;
+  res.type('json');               // => 'application/json'
+  res.json('{OK}');                 // => send json back to client
+});
+
 
 // Manage the income outbout messages
 app.post('/closedcase',function(req,res) {

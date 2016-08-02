@@ -1,6 +1,6 @@
 {
   "name": "templogg",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Temperature Logger middleware",
   "main": "app.js",
   "scripts": {
@@ -9,7 +9,6 @@
   "author": "Ferruccio Irionè",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "jsforce": "^1.7.0",
     "socket.io": "^1.4.8"
