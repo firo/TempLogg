@@ -96,7 +96,7 @@ app.get('/:temp', function (req, res) {
 app.get('/delta/:var', function (req, res) {
   app.locals.refdelta = req.params.var;
   res.type('json');               // => 'application/json'
-  res.json('{OK}');                 // => send json back to client
+  res.json(app.locals.refdelta);                 // => send json back to client
 });
 
 
