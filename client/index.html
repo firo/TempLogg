@@ -12,6 +12,7 @@
 
 </head>
 <body>
+    <div id="messageUpdate"></div>
     <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
     <script>
@@ -23,6 +24,10 @@
                 useUTC: false
             }
         });
+
+        socket.on('messageUpdate', function(data) {
+          $('#messageUpdate').append(data.message);
+        })
 
         $('#container').highcharts({
             chart: {

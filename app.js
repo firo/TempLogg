@@ -47,9 +47,11 @@ app.use('/:temp', function (req, res, next) {
     var max = Math.max.apply(null, app.locals.data);
     var min = Math.min.apply(null, app.locals.data);
     delta = max - min;
+    io.sockets.emit('messageUpdate', 'Current delta is '+ delta);
     // console.log('max: ' + max + ' min: '+ min);
     if ( delta > 3 ) {
       //console.log('OPEN CASE');
+
       conn.login(username, password, function(err, userInfo) {
         if (err) { return console.error(err); }
         var records = [];
@@ -64,6 +66,7 @@ app.use('/:temp', function (req, res, next) {
                                       SuppliedName : 'Frigo17B' }, function(err, ret) {
           if (err || !ret.success) { return console.error(err, ret); }
           //console.log("Created record id : " + ret.id);
+          io.sockets.emit('messageUpdate', 'Case created id: '+ ret.id);
         });
 
         conn.logout(function(err) {
@@ -77,6 +80,7 @@ app.use('/:temp', function (req, res, next) {
       console.log('update CASE priority red');
     }*/
   } else {
+    io.sockets.emit('messageUpdate', 'not enough data...');
     // console.log('need more data');
   }
   next();
