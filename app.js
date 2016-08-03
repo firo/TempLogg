@@ -33,7 +33,7 @@ app.use('/:temp', function (req, res, next) {
 
 // logger for temperature by device id and emit temperature to all sockets connected
 app.use('/:temp', function (req, res, next) {
-  console.log('-> temperature: ' + req.params.temp);
+  //console.log('-> temperature: ' + req.params.temp);
   var date = new Date().getTime();
   io.sockets.emit('temperatureUpdate', date, req.params.temp); // dashboard web
   next();
@@ -47,7 +47,7 @@ app.use('/:temp', function (req, res, next) {
     var max = Math.max.apply(null, app.locals.data);
     var min = Math.min.apply(null, app.locals.data);
     delta = max - min;
-    io.sockets.emit('messageUpdate', 'Current delta is '+ delta);
+    io.sockets.emit('messageUpdate', 'Current delta is '+ delta + ' ('+ min + '-'+ max + ')');
     // console.log('max: ' + max + ' min: '+ min);
     if ( delta > 3 ) {
       //console.log('OPEN CASE');
@@ -81,7 +81,7 @@ app.use('/:temp', function (req, res, next) {
     }*/
   } else {
     io.sockets.emit('messageUpdate', 'not enough data...');
-    // console.log('need more data');
+    console.log('need more data');
   }
   next();
 });

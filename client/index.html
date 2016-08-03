@@ -14,7 +14,7 @@
 <body>
     <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     <div id="messageUpdate"></div>
-    
+
     <script>
     var socket = io();
     $(function () {
@@ -26,7 +26,8 @@
         });
 
         socket.on('messageUpdate', function(data) {
-          $('#messageUpdate').append(data.message);
+          console.log(data);
+          $('#messageUpdate').html(data);
         })
 
         $('#container').highcharts({
