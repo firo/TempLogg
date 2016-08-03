@@ -48,7 +48,7 @@ app.use('/:temp', function (req, res, next) {
     var min = Math.min.apply(null, app.locals.data);
     delta = max - min;
     // console.log('max: ' + max + ' min: '+ min);
-    if ( delta > app.locals.refdelta ) {
+    if ( delta > 3 ) {
       //console.log('OPEN CASE');
       conn.login(username, password, function(err, userInfo) {
         if (err) { return console.error(err); }
@@ -79,7 +79,6 @@ app.use('/:temp', function (req, res, next) {
   } else {
     // console.log('need more data');
   }
-
   next();
 });
 
