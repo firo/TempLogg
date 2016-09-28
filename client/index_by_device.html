@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8" name="viewport" content="width=device-width" />
     <title>
-        IoT Realtime Frigo17B Temperature
+        IoT Realtime Temperature
     </title>
     <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
     <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
@@ -15,6 +15,8 @@
     <div id="messageUpdate"></div>
 
     <script>
+    var device = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+    var channel = 'tempUpd-' + device;
     var socket = io();
     $(function () {
     $(document).ready(function () {
@@ -24,8 +26,7 @@
             }
         });
 
-        socket.on('messageUpdate', function(data) {
-          console.log(data);
+        socket.on('msgUpd-'+device, function(data) {
           $('#messageUpdate').html(data);
         })
 
@@ -37,7 +38,7 @@
                 events: {
                     load: function () {
                         var series = this.series[0];
-                        socket.on('temperatureUpdate', function (t, d) {
+                        socket.on(channel, function (t, d) {
                           console.log(d);
                               var x = (new Date()).getTime(),
                                   y = parseFloat(d);
@@ -49,7 +50,7 @@
                 }
             },
             title: {
-                text: 'IoT Realtime Frigo17B Temperature'
+                text: 'IoT Realtime Temperature for ' + device
             },
             xAxis: {
                 type: 'datetime',

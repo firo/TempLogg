@@ -1,7 +1,7 @@
 # Logs
 logs
 *.log
-*.jpg
+
 
 test.js
 test_*
@@ -32,3 +32,4 @@ build/Release
 node_modules/*
 
 config*.json
+app_*

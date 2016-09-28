@@ -4,7 +4,6 @@ var http 	    = 	require('http').Server(app);
 var io 		    = 	require('socket.io')(http);
 var jsforce = require('jsforce');
 
-
 app.locals.data = [];
 app.locals.case_id = [];
 app.locals.refdelta = 3;
@@ -12,11 +11,11 @@ app.locals.refdelta = 3;
 var conn = new jsforce.Connection();
 var env = process.env.NODE_ENV || 'development';
 var json = { status: '' };
-var username = 'admin@firo.trial';
-var password = 'salesforce1' + 'Iy1rWE4nTYF0TMzihuAtVakun'
+var username = process.env.SFDC_UID;
+var password = process.env.PWD + process.env.SFDC_TOKEN;
 
-app.use('/js',express.static( __dirname + '/client/js'));
-app.use('/style',express.static( __dirname + '/client/css'));
+app.use('/js',    express.static( __dirname + '/client/js'));
+app.use('/style', express.static( __dirname + '/client/css'));
 
 // --> Express Middleware
 // rules for defining the response and light color
@@ -31,12 +30,23 @@ app.use('/:temp', function (req, res, next) {
   next();
 });
 
-// logger for temperature by device id and emit temperature to all sockets connected
+// logger for temperature and emit temperature to all sockets connected
 app.use('/:temp', function (req, res, next) {
   //console.log('-> temperature: ' + req.params.temp);
   var date = new Date().getTime();
   io.sockets.emit('temperatureUpdate', date, req.params.temp); // dashboard web
   next();
+});
+
+// logger for temperature by device id and emit temperature to all sockets connected
+app.use('/track/:device/:temp', function (req, res, next) {
+  //console.log('-> temperature: ' + req.params.temp);
+  var date = new Date().getTime();
+  var channel = 'tempUpd-' + req.params.device;
+  io.sockets.emit(channel, date, req.params.temp); // dashboard web
+  json.status = 'ok';
+  res.type('json');               // => 'application/json'
+  res.json(json);
 });
 
 // compute the data analytics
@@ -75,10 +85,7 @@ app.use('/:temp', function (req, res, next) {
         });
 
       });
-    } /*
-    else if (delta > 5 ) {
-      console.log('update CASE priority red');
-    }*/
+    }
   } else {
     io.sockets.emit('messageUpdate', 'not enough data...');
     console.log('need more data');
@@ -86,10 +93,8 @@ app.use('/:temp', function (req, res, next) {
   next();
 });
 
-
-
 // The handler function (middleware system).
-// The function handles GET requests to the /:id/:temp path.
+// The function handles GET requests to the /:temp path.
 app.get('/:temp', function (req, res) {
   res.type('json');               // => 'application/json'
   res.json(json);                 // => send json back to client
@@ -99,16 +104,7 @@ app.get('/:temp', function (req, res) {
 app.get('/delta/:var', function (req, res) {
   app.locals.refdelta = req.params.var;
   res.type('json');               // => 'application/json'
-  res.json(app.locals.refdelta);                 // => send json back to client
-});
-
-
-// Manage the income outbout messages
-app.post('/closedcase',function(req,res) {
-  //req.setEncoding('utf8');
-  console.log('soap post in call');
-  console.log("request: %j", req.body);
-  res.end("ok");
+  res.json(app.locals.refdelta);  // => send json back to client
 });
 
 // routing for homepage
@@ -117,10 +113,16 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/client/index.html');
 });
 
+// routing for homepage by device
+app.get('/rtm/:device', function(req, res){
+  res.sendFile(__dirname + '/client/index_by_device.html');
+});
+
 // Express
 var port = process.env.PORT || 3000; // Use the port that Heroku provides or default to 5000
 http.listen(port, function(){
   console.log("Express server listening on port %d in %s mode", port, app.settings.env);
+  //console.log(app._router.stack);
 });
 
 // rules for chaching data
